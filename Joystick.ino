@@ -106,5 +106,5 @@ void loop() {
     Serial.print(motorcontrol[MOTOR_RIGHT]);
     Serial.print(" - Direction: ");
     Serial.println(motorcontrol[DIRECTION]);
-    delay(100);
+    // delay(100);
 }
