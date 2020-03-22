@@ -55,16 +55,16 @@ void loop() {
     Y_POS = analogRead(JOYSTICK_Y_PIN);
 
     // Determine if this is a forward or backward motion
-    if (Y_POS < IDLE_POSITION - DEAD_ZONE) { // Backwards
+    if (Y_POS < IDLE_POSITION - DEAD_ZONE) { // Backwards ### REPLACED AS FORDWARD IN CURRENT JOYSTICK
         // Set Motors backward
-        motorcontrol[DIRECTION] = 1;    
+        motorcontrol[DIRECTION] = 0; // ### REPLACED AS FORDWARD IN CURRENT JOYSTICK (SHOULD BE 1)
         //Determine Motor Speeds
         // As we are going backwards we need to reverse readings
         motorcontrol[MOTOR_LEFT] = map(JOYSTICK_Y_PIN, IDLE_POSITION - DEAD_ZONE, 0, 0, 255);
         motorcontrol[MOTOR_RIGHT] = map(JOYSTICK_Y_PIN, IDLE_POSITION - DEAD_ZONE, 0, 0, 255);
-    } else if (Y_POS > IDLE_POSITION + DEAD_ZONE) { // Forward
+    } else if (Y_POS > IDLE_POSITION + DEAD_ZONE) { // Forward ### REPLACED AS BACKWARD IN CURRENT JOYSTICK
         // Set Motors forward
-        motorcontrol[DIRECTION] = 0;    
+        motorcontrol[DIRECTION] = 1; // ### REPLACED AS BACKWARD IN CURRENT JOYSTICK (SHOULD BE 1)
         //Determine Motor Speeds
         motorcontrol[MOTOR_LEFT] = map(JOYSTICK_Y_PIN, IDLE_POSITION + DEAD_ZONE, 1023, 0, 255);
         motorcontrol[MOTOR_RIGHT] = map(JOYSTICK_Y_PIN, IDLE_POSITION + DEAD_ZONE, 1023, 0, 255);
