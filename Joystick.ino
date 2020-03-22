@@ -4,17 +4,17 @@
 
 
 //Joystick Pins
-#define JOYSTICK_X_PIN A0;                                               
-#define JOYSTICK_Y_PIN A1;
+#define JOYSTICK_X_PIN A0
+#define JOYSTICK_Y_PIN A1
 
 // Define Joystick Values - Start at 512 (middle position)
-#define IDLE_POSITION 512;
-#define DEAD_ZONE 52;
-#define MIN_SPEED 8;
+#define IDLE_POSITION 512
+#define DEAD_ZONE 52
+#define MIN_SPEED 8
 
-#define DIRECTION 2;
-#define MOTOR_RIGHT 1;
-#define MOTOR_LEFT 0;
+#define DIRECTION 2
+#define MOTOR_RIGHT 1
+#define MOTOR_LEFT 0
 
 int X_POS = IDLE_POSITION;
 int Y_POS = IDLE_POSITION;
@@ -24,11 +24,11 @@ int Y_POS = IDLE_POSITION;
 uint8_t motorcontrol[3];
 
 //nRF24L01 Pins
-#define CE_PIN 7;
-#define SCK_PIN 13;
-#define MISO_PIN 12;
-#define CSN_PIN  8;
-#define MOSI_PIN 11; 
+#define CE_PIN 7
+#define SCK_PIN 13
+#define MISO_PIN 12
+#define CSN_PIN  8
+#define MOSI_PIN 11;
 
 RF24 radio(CE_PIN, CSN_PIN); // CE, CSN
 const byte address[6] = "00001";
