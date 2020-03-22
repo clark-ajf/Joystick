@@ -46,7 +46,7 @@ void setup() {
 
     //Initializing Joystick PINs as INPUT
     pinMode(JOYSTICK_X_PIN, INPUT) ;                     
-    pinMode(JOYSTICK_Y_PIN, INPUT) ;    
+    pinMode(JOYSTICK_Y_PIN, INPUT) ;
 }
 
 void loop() {
@@ -106,5 +106,4 @@ void loop() {
     Serial.print(motorcontrol[MOTOR_RIGHT]);
     Serial.print(" - Direction: ");
     Serial.println(motorcontrol[DIRECTION]);
-    // delay(100);
 }
