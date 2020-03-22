@@ -12,6 +12,10 @@
 #define DEAD_ZONE 52;
 #define MIN_SPEED 8;
 
+#define DIRECTION 2;
+#define MOTOR_RIGHT 1;
+#define MOTOR_LEFT 0;
+
 int X_POS = IDLE_POSITION;
 int Y_POS = IDLE_POSITION;
 
@@ -31,10 +35,18 @@ const byte address[6] = "00001";
 
 
 void setup() {
+    //Starting the serial communication at 9600 baud rate
+    Serial.begin (9600);
+
+    // Initializing Radio Trasmitter
     radio.begin();
     radio.openWritingPipe(address);
     radio.setPALevel(RF24_PA_MIN);
     radio.stopListening();
+
+    //Initializing Joystick PINs as INPUT
+    pinMode(JOYSTICK_X_PIN, INPUT) ;                     
+    pinMode(JOYSTICK_Y_PIN, INPUT) ;    
 }
 
 void loop() {
@@ -45,47 +57,54 @@ void loop() {
     // Determine if this is a forward or backward motion
     if (Y_POS < IDLE_POSITION - DEAD_ZONE) { // Backwards
         // Set Motors backward
-        motorcontrol[2] = 1;    
+        motorcontrol[DIRECTION] = 1;    
         //Determine Motor Speeds
         // As we are going backwards we need to reverse readings
-        motorcontrol[0] = map(JOYSTICK_Y_PIN, IDLE_POSITION - DEAD_ZONE, 0, 0, 255);
-        motorcontrol[1] = map(JOYSTICK_Y_PIN, IDLE_POSITION - DEAD_ZONE, 0, 0, 255);
+        motorcontrol[MOTOR_LEFT] = map(JOYSTICK_Y_PIN, IDLE_POSITION - DEAD_ZONE, 0, 0, 255);
+        motorcontrol[MOTOR_RIGHT] = map(JOYSTICK_Y_PIN, IDLE_POSITION - DEAD_ZONE, 0, 0, 255);
     } else if (Y_POS > IDLE_POSITION + DEAD_ZONE) { // Forward
         // Set Motors forward
-        motorcontrol[2] = 0;    
+        motorcontrol[DIRECTION] = 0;    
         //Determine Motor Speeds
-        motorcontrol[0] = map(JOYSTICK_Y_PIN, IDLE_POSITION + DEAD_ZONE, 1023, 0, 255);
-        motorcontrol[1] = map(JOYSTICK_Y_PIN, IDLE_POSITION + DEAD_ZONE, 1023, 0, 255);
+        motorcontrol[MOTOR_LEFT] = map(JOYSTICK_Y_PIN, IDLE_POSITION + DEAD_ZONE, 1023, 0, 255);
+        motorcontrol[MOTOR_RIGHT] = map(JOYSTICK_Y_PIN, IDLE_POSITION + DEAD_ZONE, 1023, 0, 255);
 
     } else { // Stop
-        motorcontrol[0] = 0;
-        motorcontrol[1] = 0;
-        motorcontrol[3] = 0;
+        motorcontrol[MOTOR_LEFT] = 0;
+        motorcontrol[MOTOR_RIGHT] = 0;
+        motorcontrol[DIRECTION] = 0;
     }
 
     // Now the steering. The Horizontal position will "weigh" the motor speed values for each motor
     if (X_POS < IDLE_POSITION - DEAD_ZONE) { // Left
         X_POS = map(JOYSTICK_X_PIN, IDLE_POSITION - DEAD_ZONE, 0, 0, 255);
-        motorcontrol[0] = motorcontrol[0] - X_POS;
-        motorcontrol[1] = motorcontrol[1] + X_POS;
+        motorcontrol[MOTOR_LEFT] = motorcontrol[MOTOR_LEFT] - X_POS;
+        motorcontrol[MOTOR_RIGHT] = motorcontrol[MOTOR_RIGHT] + X_POS;
 
         // Don't exceed range of 0-255 for motor speeds
-        motorcontrol[0] = motorcontrol[0] < 0? 0: motorcontrol[0];
-        motorcontrol[1] = motorcontrol[1] > 255? 255: motorcontrol[1];
+        motorcontrol[MOTOR_LEFT] = motorcontrol[MOTOR_LEFT] < 0? 0: motorcontrol[MOTOR_LEFT];
+        motorcontrol[MOTOR_RIGHT] = motorcontrol[MOTOR_RIGHT] > 255? 255: motorcontrol[1];
     } else if (X_POS > IDLE_POSITION + DEAD_ZONE) { // Right
         X_POS = map(JOYSTICK_X_PIN, IDLE_POSITION + DEAD_ZONE, 1023, 0, 255);
-        motorcontrol[0] = motorcontrol[0] + X_POS;
-        motorcontrol[1] = motorcontrol[1] - X_POS;
+        motorcontrol[MOTOR_LEFT] = motorcontrol[MOTOR_LEFT] + X_POS;
+        motorcontrol[MOTOR_RIGHT] = motorcontrol[MOTOR_RIGHT] - X_POS;
 
         // Don't exceed range of 0-255 for motor speeds
-        motorcontrol[1] = motorcontrol[1] < 0? 0: motorcontrol[1];
-        motorcontrol[0] = motorcontrol[0] > 255? 255: motorcontrol[0];
+        motorcontrol[MOTOR_RIGHT] = motorcontrol[MOTOR_RIGHT] < 0? 0: motorcontrol[1];
+        motorcontrol[MOTOR_LEFT] = motorcontrol[MOTOR_LEFT] > 255? 255: motorcontrol[MOTOR_LEFT];
     }
 
     // Adjust to prevent "buzzing" at very low speed
-    motorcontrol[0] = motorcontrol[0] < MIN_SPEED ? 0: motorcontrol[0];
-    motorcontrol[1] = motorcontrol[1] < MIN_SPEED ? 0: motorcontrol[1];
+    motorcontrol[MOTOR_LEFT] = motorcontrol[MOTOR_LEFT] < MIN_SPEED ? 0: motorcontrol[MOTOR_LEFT];
+    motorcontrol[MOTOR_RIGHT] = motorcontrol[MOTOR_RIGHT] < MIN_SPEED ? 0: motorcontrol[MOTOR_RIGHT];
 
     radio.write(motorcontrol, sizeof(motorcontrol));
+
+    Serial.print("Motor LEFT: ");
+    Serial.print(motorcontrol[MOTOR_LEFT]);
+    Serial.print(" - Motor RIGHT: ");
+    Serial.print(motorcontrol[MOTOR_RIGHT]);
+    Serial.print(" - Direction: ");
+    Serial.println(motorcontrol[DIRECTION]);
     delay(100);
 }
